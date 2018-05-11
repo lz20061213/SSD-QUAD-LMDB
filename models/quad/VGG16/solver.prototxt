@@ -1,0 +1,17 @@
+train_net: "models/quad/VGG16/train.prototxt"
+
+base_lr: 0.001
+weight_decay: 0.0005
+
+lr_policy: "multistep"
+stepvalue: 80000
+stepvalue: 100000
+stepvalue: 120000
+gamma: 0.1
+
+momentum: 0.9
+
+display: 20
+
+snapshot: 0
+snapshot_prefix: "QUAD_VGG16"

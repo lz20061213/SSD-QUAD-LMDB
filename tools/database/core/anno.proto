@@ -1,0 +1,30 @@
+syntax = "proto2";
+
+message Datum {
+  optional int32 channels = 1;
+  optional int32 height = 2;
+  optional int32 width = 3;
+  optional bytes data = 4;
+  optional int32 label = 5;
+  repeated float float_data = 6;
+  optional bool encoded = 7 [default = false];
+}
+
+message Annotation {
+  optional float x1 = 1;
+  optional float y1 = 2;
+  optional float x2 = 3;
+  optional float y2 = 4;
+  optional float x3 = 5;
+  optional float y3 = 6;
+  optional float x4 = 7;
+  optional float y4 = 8;
+  optional string name = 9;
+  optional bool difficult = 10;
+}
+
+message AnnotatedDatum {
+  optional Datum datum = 1;
+  optional string filename = 2;
+  repeated Annotation annotation = 3;
+}
