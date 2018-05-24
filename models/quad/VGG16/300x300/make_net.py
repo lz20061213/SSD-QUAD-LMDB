@@ -83,6 +83,8 @@ if __name__ == '__main__':
         max_sizes.append(min_dim * (ratio + step) / 100.)
     min_sizes = [min_dim * 10 / 100.] + min_sizes
     max_sizes = [min_dim * 20 / 100.] + max_sizes
+    print min_sizes
+    print max_sizes
     aspect_ratios = [[2], [2, 3], [2, 3], [2, 3], [2], [2]]
     steps = [8, 16, 32, 64, 100, 300]
     normalizations = [20, -1, -1, -1, -1, -1]
@@ -147,7 +149,7 @@ if __name__ == '__main__':
     name = "cls_loss"
     cls_loss_inputs = [net.mbox_conf_reshape, net.labels]
     net.cls_loss = L.SoftmaxWithLoss(*cls_loss_inputs, name=name,
-            loss_param={'ignore_label': -1}, softmax_param={'axis': 2}, loss_weight=4.0)
+            loss_param={'ignore_label': -1}, softmax_param={'axis': 2}, loss_weight=8.0)
 
     # Create the MultiBoxTargetLayer for bbox
     name = "mbox_target"

@@ -10,20 +10,23 @@ import numpy as np
 
 import dragon.vm.caffe as caffe
 
-from config import cfg
+from config import cfg, cfg_from_file
 from core.train import train_net
 from datasets.factory import get_imdb
 
 from layers import *
 
-imdb_name = 'hand_2018_trainval'
-gpu_id = 0
+imdb_name = 'plane_2018_trainval'
+gpu_id = 1
 
-solver_txt = 'models/quad/VGG16/solver.prototxt'
+solver_txt = 'models/quad/VGG16/300x300/solver.prototxt'
 pretrained_model = 'data/imagenet_models/VGG16.reduce.caffemodel'
+#snapshot_model = 'output/plane_2018_trainval/QUAD_VGG16_iter_70000.caffemodel'
 snapshot_model = None
-start_iter = 0
-max_iters = 360000
+#start_iter = 70000
+start_iter = 1
+max_iters = 150000
+warm_up = 0
 import dragon.config
 dragon.config.LogOptimizedGraph()
 import dragon.memonger as opt
@@ -54,4 +57,5 @@ if __name__ == '__main__':
               pretrained_model=pretrained_model,
               snapshot_model=snapshot_model,
               start_iter=start_iter,
-              max_iters=max_iters)
+              max_iters=max_iters,
+              warm_up=warm_up)

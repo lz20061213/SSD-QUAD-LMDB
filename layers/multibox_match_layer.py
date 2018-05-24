@@ -9,6 +9,7 @@ import dragon.core.workspace as ws
 import dragon.vm.caffe as caffe
 import numpy as np
 from six.moves import xrange
+import cv2
 
 from core.utils.cython_bbox import bbox_overlaps
 
@@ -37,6 +38,24 @@ class MultiBoxMatchLayer(caffe.Layer):
         # fetch the default boxes(anchors)
         prior_boxes = ws.FetchTensor(bottom[0])
 
+        '''
+        # test the prior_boxes
+        im = np.ones(shape=(300, 300, 3), dtype=np.uint8) * 255
+        for i in range(prior_boxes.shape[0]):
+            prior_box = prior_boxes[i, :4]
+            tlx = int(prior_box[0] * im.shape[1])
+            tly = int(prior_box[1] * im.shape[0])
+            brx = int(prior_box[2] * im.shape[1])
+            bry = int(prior_box[3] * im.shape[0])
+            if tlx < 0 or tlx > im.shape[1] or \
+               tly < 0 or tly > im.shape[0] or \
+               brx < 0 or brx > im.shape[1] or \
+               bry < 0 or bry > im.shape[0]:
+                continue
+            cv2.rectangle(im, (tlx, tly), (brx, bry), (0, 0, 255), 1, 8)
+            cv2.imshow('im', im)
+            cv2.waitKey(0)
+        '''
         # fetch the annotations
         annotations = ws.FetchTensor(bottom[1])
 

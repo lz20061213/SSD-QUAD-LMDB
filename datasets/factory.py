@@ -24,8 +24,9 @@ for year in ['2017']:
 
 for year in ['2018']:
     for split in ['trainval', 'test']:
-        name = 'hand_{}_{}'.format(year, split)
-        __sets[name] = (lambda split=split, year=year: quad(split, year))
+        for classname in ['hand', 'plane']:
+            name = '{}_{}_{}'.format(classname, year, split)
+            __sets[name] = (lambda classname=classname, split=split, year=year: quad(classname, split, year))
 
 def get_imdb(name):
     """Get an imdb (image database) by name."""

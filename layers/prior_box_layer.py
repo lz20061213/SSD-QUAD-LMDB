@@ -67,6 +67,7 @@ class PriorBoxLayer(caffe.Layer):
         all_anchors = (self._anchors.reshape((1, A, 12)) +
                        shifts.reshape((1, K, 12)).transpose((1, 0, 2)))
         all_anchors = all_anchors.reshape((K * A, 12)).astype(np.float32)
+
         all_anchors[:, 0::2] /= im_info[1] # normalize by width
         all_anchors[:, 1::2] /= im_info[0] # normalize by height
 

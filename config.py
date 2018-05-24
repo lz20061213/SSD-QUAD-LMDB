@@ -23,7 +23,7 @@ cfg = __C
 __C.TRAIN = edict()
 
 # Images to use per minibatch
-__C.TRAIN.IMS_PER_BATCH = 32
+__C.TRAIN.IMS_PER_BATCH = 16
 
 # Use shuffle after each epoch
 __C.TRAIN.USE_SHUFFLE = True
@@ -116,6 +116,8 @@ __C.TRAIN.SNAPSHOT_ITERS = 5000
 # infix to yield the path: <prefix>[_<infix>]_iters_XYZ.caffemodel
 __C.TRAIN.SNAPSHOT_INFIX = ''
 
+__C.TRAIN.SNAPSHOT_FOLDER = ''
+
 #
 # Testing options
 #
@@ -124,7 +126,7 @@ __C.TEST = edict()
 
 __C.TEST.BATCH_SIZE = 1
 
-__C.TEST.THRESH = 0.995
+__C.TEST.THRESH = 0.5
 
 __C.TEST.NMS = 0.45
 

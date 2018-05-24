@@ -8,11 +8,11 @@ def AddExtraLayers(net, use_batchnorm=True, lr_mult=1):
     use_relu = True
 
     # Add additional convolutional layers.
-    # 19 x 19
+    # 32 x 32
     from_layer = net.keys()[-1]
 
     # TODO(weiliu89): Construct the name using the last layer to avoid duplication.
-    # 10 x 10
+    # 16 x 16
     out_layer = "conv6_1"
     ConvBNLayer(net, from_layer, out_layer, use_batchnorm, use_relu, 256, 1, 0, 1,
         lr_mult=lr_mult)
@@ -22,7 +22,7 @@ def AddExtraLayers(net, use_batchnorm=True, lr_mult=1):
     ConvBNLayer(net, from_layer, out_layer, use_batchnorm, use_relu, 512, 3, 1, 2,
         lr_mult=lr_mult)
 
-    # 5 x 5
+    # 8 x 8
     from_layer = out_layer
     out_layer = "conv7_1"
     ConvBNLayer(net, from_layer, out_layer, use_batchnorm, use_relu, 128, 1, 0, 1,
@@ -33,7 +33,7 @@ def AddExtraLayers(net, use_batchnorm=True, lr_mult=1):
     ConvBNLayer(net, from_layer, out_layer, use_batchnorm, use_relu, 256, 3, 1, 2,
       lr_mult=lr_mult)
 
-    # 3 x 3
+    # 4 x 4
     from_layer = out_layer
     out_layer = "conv8_1"
     ConvBNLayer(net, from_layer, out_layer, use_batchnorm, use_relu, 128, 1, 0, 1,
@@ -44,7 +44,7 @@ def AddExtraLayers(net, use_batchnorm=True, lr_mult=1):
     ConvBNLayer(net, from_layer, out_layer, use_batchnorm, use_relu, 256, 3, 0, 1,
       lr_mult=lr_mult)
 
-    # 1 x 1
+    # 2 x 2
     from_layer = out_layer
     out_layer = "conv9_1"
     ConvBNLayer(net, from_layer, out_layer, use_batchnorm, use_relu, 128, 1, 0, 1,
@@ -55,6 +55,17 @@ def AddExtraLayers(net, use_batchnorm=True, lr_mult=1):
     ConvBNLayer(net, from_layer, out_layer, use_batchnorm, use_relu, 256, 3, 0, 1,
       lr_mult=lr_mult)
 
+    # 1 x 1
+    from_layer = out_layer
+    out_layer = "conv10_1"
+    ConvBNLayer(net, from_layer, out_layer, use_batchnorm, use_relu, 128, 1, 0, 1,
+      lr_mult=lr_mult)
+
+    from_layer = out_layer
+    out_layer = "conv10_2"
+    ConvBNLayer(net, from_layer, out_layer, use_batchnorm, use_relu, 256, 4, 1, 1,
+      lr_mult=lr_mult)
+
     return net
 
 def make(split='train'):
@@ -63,36 +74,35 @@ def make(split='train'):
     net.data, net.gt_boxes, net.im_info = L.Python(ntop=3, module='layers.box_data_layer', layer='BoxDataLayer')
     VGGNetBody(net, from_layer='data', fully_conv=True, reduced=True, dilated=True, dropout=False)
 
-    mbox_source_layers = ['conv4_3', 'fc7', 'conv6_2', 'conv7_2', 'conv8_2', 'conv9_2']
+    mbox_source_layers = ['conv4_3', 'fc7', 'conv6_2', 'conv7_2', 'conv8_2', 'conv9_2', 'conv10_2']
     use_batchnorm = False
     lr_mult = 1
     min_sizes = []
     max_sizes = []
-    min_ratio = 20
+    min_ratio = 15
     max_ratio = 90
     step = int(math.floor((max_ratio - min_ratio) / (len(mbox_source_layers) - 2)))
-    min_dim = 300
+    min_dim = 512
     for ratio in xrange(min_ratio, max_ratio + 1, step):
         min_sizes.append(min_dim * ratio / 100.)
         max_sizes.append(min_dim * (ratio + step) / 100.)
-    min_sizes = [min_dim * 10 / 100.] + min_sizes
-    max_sizes = [min_dim * 20 / 100.] + max_sizes
-    aspect_ratios = [[2], [2, 3], [2, 3], [2, 3], [2], [2]]
-    steps = [8, 16, 32, 64, 100, 300]
-    normalizations = [20, -1, -1, -1, -1, -1]
-    num_classes = 21
+    min_sizes = [min_dim * 7 / 100.] + min_sizes
+    max_sizes = [min_dim * 15 / 100.] + max_sizes
+    aspect_ratios = [[2], [2, 3], [2, 3], [2, 3], [2, 3], [2], [2]]
+    steps = [8, 16, 32, 64, 128, 256, 512]
+    normalizations = [20, -1, -1, -1, -1, -1, -1]
+    num_classes = 2
     share_location = True
     flip = True
     clip = False
-    prior_variance = [0.1, 0.1, 0.2, 0.2]
+    prior_variance = [0.1, 0.1, 0.2, 0.2, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
     AddExtraLayers(net, use_batchnorm, lr_mult=lr_mult)
-    mbox_layers = CreateMultiBoxHead(net, data_layer='data', from_layers=mbox_source_layers,
+    mbox_layers = CreateMultiQuadHead(net, data_layer='data', from_layers=mbox_source_layers,
                                      use_batchnorm=use_batchnorm, min_sizes=min_sizes, max_sizes=max_sizes,
                                      aspect_ratios=aspect_ratios, steps=steps, normalizations=normalizations,
                                      num_classes=num_classes, share_location=share_location, flip=flip, clip=clip,
                                      prior_variance=prior_variance, kernel_size=3, pad=1, lr_mult=lr_mult)
 
-    num_classes = 21
     overlap_threshold = 0.5
     neg_pos_ratio = 3.
     neg_overlap = 0.5
@@ -107,7 +117,7 @@ def make(split='train'):
             net_param = net.to_proto()
             del net_param.layer[0]
             net_param.input.extend(['data'])
-            net_param.input_shape.extend([caffe_pb2.BlobShape(dim=[1, 3, 300, 300])])
+            net_param.input_shape.extend([caffe_pb2.BlobShape(dim=[1, 3, min_dim, min_dim])])
             net_param.input.extend(['im_info'])
             net_param.input_shape.extend([caffe_pb2.BlobShape(dim=[2])])
             f.write(str(net_param))

@@ -88,3 +88,4 @@ class MultiBoxTargetLayer(caffe.Layer):
         # feed outside weights for SmoothL1Loss
         ws.FeedTensor(top[2], all_bbox_outside_weights)
 
+

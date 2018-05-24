@@ -15,10 +15,11 @@ from config import cfg
 import time, os
 
 cfg.DATA_DIR = 'data/quad'
-imdb_name = 'hand_2018_trainval'
-gpu_id = 2
-prototxt = 'models/quad/VGG16/test.prototxt'
-caffemodel = 'output/hand_2018_trainval/QUAD_VGG16_iter_1000.caffemodel'
+imdb_name = 'plane_2018_test'
+
+gpu_id = 3
+prototxt = 'models/quad/VGG16/300x300/test.prototxt'
+caffemodel = 'output/plane_2018_trainval/QUAD_VGG16_iter_70000.caffemodel'
 vis = True
 
 if __name__ == '__main__':

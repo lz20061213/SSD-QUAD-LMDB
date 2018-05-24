@@ -1,6 +1,6 @@
-train_net: "models/quad/VGG16/train.prototxt"
+train_net: "models/quad/AirNet/300x300/train.prototxt"
 
-base_lr: 0.001
+base_lr: 0.0001
 weight_decay: 0.0005
 
 lr_policy: "multistep"
@@ -14,4 +14,4 @@ momentum: 0.9
 display: 20
 
 snapshot: 0
-snapshot_prefix: "QUAD_VGG16"
+snapshot_prefix: "QUAD_AIRNET"

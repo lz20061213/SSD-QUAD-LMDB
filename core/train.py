@@ -33,11 +33,16 @@ class SolverWrapper(object):
         with open(solver_prototxt, 'rt') as f:
             pb2.text_format.Merge(f.read(), self.solver_param)
 
-    def train_model(self, max_iters):
+    def train_model(self, max_iters, warm_up):
         last_snapshot_iter = -1
         timer = Timer()
         model_paths = []
+        # lower the learning rate then warm-up
+        if warm_up != 0:
+            self.solver._optimizer.lr *= self.solver_param.gamma
         while self.solver.iter < max_iters:
+            if warm_up > 0 and self.solver.iter == warm_up:
+                self.solver._optimizer.lr /= self.solver_param.gamma
             timer.tic()
             self.solver.step(1)
             timer.toc()
@@ -75,7 +80,7 @@ class SolverWrapper(object):
 
 def train_net(solver_txt, output_dir,
               pretrained_model=None, snapshot_model=None,
-              start_iter=0, max_iters=60000):
+              start_iter=0, max_iters=60000, warm_up=0):
 
     sw = SolverWrapper(solver_txt, output_dir,
                        pretrained_model=pretrained_model)
@@ -84,6 +89,6 @@ def train_net(solver_txt, output_dir,
         sw.restore(start_iter, snapshot_model)
 
     logger.info('Solving...')
-    model_paths = sw.train_model(max_iters)
+    model_paths = sw.train_model(max_iters, warm_up)
     logger.info('done solving')
     return model_paths
